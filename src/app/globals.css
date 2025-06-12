@@ -1,8 +1,9 @@
-
+/* ===== RESET AND BASE STYLES ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  cursor: none !important;
 }
 
 html {
@@ -22,33 +23,35 @@ body {
   overflow-x: hidden;
 }
 
-
-.magnetic-cursor {
+/* ===== CUSTOM CURSOR SYSTEM (SCROLLSMOOTHER COMPATIBLE) ===== */
+.magnetic-cursor-main {
   position: fixed !important;
   width: 20px;
   height: 20px;
   background: #ff6b35;
   border-radius: 50%;
   pointer-events: none !important;
-  z-index: 999999 !important;
+  z-index: 2147483647 !important;
   mix-blend-mode: difference;
-  transition: all 0.1s ease;
-  transform-origin: center;
+  will-change: transform;
+  top: 0;
+  left: 0;
 }
 
-.cursor-follower {
+.magnetic-cursor-follower {
   position: fixed !important;
   width: 40px;
   height: 40px;
   border: 2px solid rgba(255, 107, 53, 0.3);
   border-radius: 50%;
   pointer-events: none !important;
-  z-index: 999998 !important;
-  transition: all 0.15s ease;
-  transform-origin: center;
+  z-index: 2147483646 !important;
+  will-change: transform;
+  top: 0;
+  left: 0;
 }
 
-.cursor-text {
+.magnetic-cursor-text {
   position: fixed !important;
   background: rgba(255, 107, 53, 0.9);
   color: white;
@@ -57,46 +60,52 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
   pointer-events: none !important;
-  z-index: 999997 !important;
+  z-index: 2147483645 !important;
   opacity: 0;
   transform: translateX(-50%) translateY(-100%);
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
 }
 
-
+/* Legacy cursor classes for backward compatibility */
+.magnetic-cursor,
+.cursor-follower,
+.cursor-text,
 .cursor {
   position: fixed !important;
-  width: 20px;
-  height: 20px;
-  background: #ff6b35;
-  border-radius: 50%;
   pointer-events: none !important;
-  z-index: 999999 !important;
-  mix-blend-mode: difference;
-  transition: transform 0.2s ease;
+  z-index: 2147483647 !important;
+  will-change: transform !important;
 }
 
+/* ===== SCROLLSMOOTHER COMPATIBILITY FIXES ===== */
+#smooth-wrapper {
+  overflow: visible !important;
+}
 
-button, a, input, textarea, select, .magnetic, .morph-btn, .quantum-domain-card, .project-card, .skill-orb, .nav-link {
+#smooth-content {
+  overflow: visible !important;
+}
+
+/* ===== INTERACTIVE ELEMENTS CURSOR HANDLING ===== */
+button, a, input, textarea, select, .magnetic, .morph-btn, .quantum-domain-card, .project-card, .skill-orb, .nav-link, .join-domain-btn, .quantum-portal-btn {
   cursor: none !important;
   pointer-events: auto !important;
   position: relative;
 }
 
-
-img, video, iframe, .floating-particle, .quantum-particle, .skill-particle {
+/* Prevent cursor interference from non-interactive elements */
+img, video, iframe, .floating-particle, .quantum-particle, .skill-particle, .floating-image {
   pointer-events: none !important;
   cursor: none !important;
 }
 
-
-section, div, main, nav, footer, .floating-section, .domains-section, .about-section, .projects-section {
+/* Section-level cursor inheritance */
+section, div, main, nav, footer, .floating-section, .domains-section, .about-section, .projects-section, .hero {
   cursor: none !important;
   pointer-events: auto;
 }
 
-
+/* ===== PRELOADER STYLES ===== */
 #preloader {
   position: fixed;
   top: 0;
@@ -141,7 +150,7 @@ section, div, main, nav, footer, .floating-section, .domains-section, .about-sec
   letter-spacing: 0.1em;
 }
 
-
+/* ===== SAVATE FONT CLASSES ===== */
 .savate-display {
   font-family: "Savate", sans-serif;
   font-optical-sizing: auto;
@@ -156,7 +165,7 @@ section, div, main, nav, footer, .floating-section, .domains-section, .about-sec
   font-style: normal;
 }
 
-
+/* ===== TYPOGRAPHY SYSTEM ===== */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.2;
@@ -204,7 +213,7 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 600px;
 }
 
-
+/* ===== BUTTON SYSTEM ===== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -242,7 +251,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
 }
 
-
+/* ===== MORPHING BUTTONS ===== */
 .morph-btn {
   position: relative;
   display: inline-flex;
@@ -287,7 +296,52 @@ h1, h2, h3, h4, h5, h6 {
   border-color: transparent;
 }
 
+/* ===== QUANTUM PORTAL BUTTONS (DOMAINS) ===== */
+.quantum-portal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 3rem;
+  background: linear-gradient(135deg, #ff6b35, #f7931e, #ff1744);
+  background-size: 200% 200%;
+  border-radius: 30px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: none !important;
+  transition: all 0.5s ease;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+  border: none;
+}
 
+.quantum-portal-btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  background-position: 100% 0%;
+  box-shadow: 
+    0 20px 50px rgba(255, 107, 53, 0.5),
+    0 0 60px rgba(255, 107, 53, 0.3);
+}
+
+.portal-energy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.quantum-portal-btn:hover .portal-energy {
+  transform: translateX(100%);
+}
+
+/* ===== SECTION LAYOUTS ===== */
 .section {
   padding: 8rem 2rem;
   max-width: 1400px;
@@ -320,7 +374,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 2px;
 }
 
-
+/* ===== GRID SYSTEMS ===== */
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -334,7 +388,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 2rem;
 }
 
-
+/* ===== FLOATING SECTIONS ===== */
 .floating-section {
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px);
@@ -377,7 +431,7 @@ h1, h2, h3, h4, h5, h6 {
     0 0 100px rgba(255, 107, 53, 0.1);
 }
 
-
+/* ===== NAVIGATION STYLES ===== */
 .navigation {
   position: fixed;
   top: 0;
@@ -412,15 +466,23 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 900;
   color: #ff6b35;
   text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+  transition: all 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  text-shadow: 0 0 30px rgba(255, 107, 53, 0.8);
 }
 
 .nav-links {
   display: flex;
-  gap: 3rem;
+  gap: 2rem;
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.nav-links a {
+.nav-link {
   color: #ffffff;
   text-decoration: none;
   font-weight: 500;
@@ -428,29 +490,57 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   transition: all 0.3s ease;
   cursor: none !important;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
 }
 
-.nav-links a::after {
+.nav-link::after {
   content: '';
   position: absolute;
   bottom: -5px;
-  left: 0;
+  left: 50%;
   width: 0;
   height: 2px;
   background: linear-gradient(90deg, #ff6b35, #f7931e);
-  transition: width 0.3s ease;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
 }
 
-.nav-links a:hover::after {
-  width: 100%;
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 80%;
 }
 
-.nav-links a:hover {
+.nav-link:hover,
+.nav-link.active {
   color: #ff6b35;
+  background: rgba(255, 107, 53, 0.1);
   text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
 }
 
+.nav-indicator {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 6px;
+  height: 6px;
+  background: #ff6b35;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 
+.nav-link.active .nav-indicator {
+  opacity: 1;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.7; }
+}
+
+/* ===== PROJECT CARDS ===== */
 .project-card {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 20px;
@@ -490,7 +580,55 @@ h1, h2, h3, h4, h5, h6 {
   transform: translate(-50%, -50%);
 }
 
+/* ===== QUANTUM DOMAIN CARDS ===== */
+.quantum-domain-card {
+  position: relative;
+  padding: 0;
+  border-radius: 25px;
+  cursor: none !important;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
 
+.quantum-domain-card:hover {
+  transform: translateY(-20px) rotateX(8deg) rotateY(3deg) scale(1.02);
+  box-shadow: 
+    0 50px 100px rgba(0, 0, 0, 0.5),
+    0 0 120px rgba(255, 107, 53, 0.3),
+    inset 0 0 100px rgba(255, 255, 255, 0.05);
+}
+
+.card-hologram {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.2), 
+    transparent, 
+    rgba(255, 0, 255, 0.2), 
+    transparent
+  );
+  border-radius: 25px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.quantum-domain-card:hover .card-hologram {
+  opacity: 1;
+  animation: hologramShift 2s ease-in-out infinite;
+}
+
+@keyframes hologramShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===== PARTICLE SYSTEMS ===== */
 .particle-field {
   position: fixed;
   top: 0;
@@ -509,6 +647,11 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none;
 }
 
+.floating-particle {
+  animation: float 15s infinite ease-in-out;
+  pointer-events: none;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
   25% { transform: translateY(-20px) rotate(90deg); }
@@ -516,7 +659,7 @@ h1, h2, h3, h4, h5, h6 {
   75% { transform: translateY(-10px) rotate(270deg); }
 }
 
-
+/* ===== GLITCH TEXT EFFECTS ===== */
 .glitch-text {
   position: relative;
   color: #ffffff;
@@ -557,7 +700,7 @@ h1, h2, h3, h4, h5, h6 {
   50% { opacity: 1; transform: translateX(2px); }
 }
 
-
+/* ===== BACKGROUND PATTERNS ===== */
 body::before {
   content: '';
   position: fixed;
@@ -582,16 +725,7 @@ body::before {
   75% { transform: translateX(-5px) translateY(5px); }
 }
 
-
-#smooth-wrapper {
-  overflow: hidden;
-}
-
-#smooth-content {
-  overflow: visible;
-}
-
-
+/* ===== FLOATING IMAGES SYSTEM ===== */
 .floating-images-container {
   pointer-events: none;
 }
@@ -607,7 +741,7 @@ body::before {
   box-shadow: 0 30px 60px rgba(255,107,53,0.4);
 }
 
-
+/* ===== ADVANCED TEXT REVEAL STYLES ===== */
 .line-wrapper {
   overflow: hidden;
   position: relative;
@@ -618,7 +752,7 @@ body::before {
   backface-visibility: hidden;
 }
 
-
+/* ===== QUANTUM EFFECTS ===== */
 .quantum-hover {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -645,13 +779,55 @@ body::before {
   left: 100%;
 }
 
-
+/* ===== SKILL SYSTEMS ===== */
 .quantum-skill-item {
   transform-style: preserve-3d;
   perspective: 1000px;
 }
 
+.skill-orb {
+  cursor: none !important;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
+.skill-star {
+  cursor: none !important;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-star::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.skill-star:hover::before {
+  left: 100%;
+}
+
+/* ===== BOARD MEMBERS SPECIFIC STYLES ===== */
+.board-section {
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255,107,53,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(247,147,30,0.08) 0%, transparent 50%);
+}
+
+.board-member:hover .member-card {
+  transform: translateY(-15px) rotateX(8deg) rotateY(2deg);
+}
+
+.member-card {
+  cursor: none !important;
+}
+
+/* ===== TEXT SELECTION STYLING ===== */
 ::selection {
   background: rgba(255, 107, 53, 0.3);
   color: #ffffff;
@@ -662,7 +838,7 @@ body::before {
   color: #ffffff;
 }
 
-
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
 .gpu-accelerated {
   will-change: transform;
   transform: translateZ(0);
@@ -674,6 +850,91 @@ body::before {
   will-change: transform;
 }
 
+/* ===== SCROLL PROGRESS INDICATOR ===== */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 4px;
+  background: linear-gradient(90deg, #ff6b35, #f7931e);
+  z-index: 10001;
+  transition: width 0.1s ease;
+}
+
+/* ===== MORPHING BACKGROUNDS ===== */
+.morphing-bg {
+  transition: background 8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.advanced-blur {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* ===== QUANTUM GRADIENT EFFECTS ===== */
+.domains-title {
+  background: linear-gradient(135deg, #ff6b35, #f7931e, #ff1744, #9c27b0);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: quantumGradient 8s ease-in-out infinite;
+  filter: drop-shadow(0 0 40px rgba(255, 107, 53, 0.5));
+}
+
+@keyframes quantumGradient {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 50% 100%; }
+  75% { background-position: 50% 0%; }
+}
+
+/* ===== HOLOGRAPHIC SCAN EFFECTS ===== */
+.holographic-scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ffff, transparent);
+  box-shadow: 0 0 20px #00ffff;
+  z-index: 10;
+}
+
+/* ===== ENERGY EFFECTS ===== */
+.energy-orb {
+  position: absolute;
+  background: radial-gradient(circle, rgba(255,107,53,0.6), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.logo-energy-ring {
+  animation: energyRing 4s linear infinite;
+}
+
+@keyframes energyRing {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.3; }
+  50% { transform: rotate(180deg) scale(1.1); opacity: 0.8; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.3; }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1024px) {
+  .nav-links {
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.8rem;
+  }
+  
+  .quantum-domain-card:hover {
+    transform: translateY(-10px) scale(1.02);
+  }
+}
 
 @media (max-width: 768px) {
   .section {
@@ -697,11 +958,22 @@ body::before {
     padding: 0 1rem;
   }
   
+  .nav-links {
+    display: none; /* Mobile menu implementation needed */
+  }
+  
+  /* MOBILE CURSOR DISABLE */
+  * {
+    cursor: auto !important;
+  }
   
   body {
     cursor: auto !important;
   }
   
+  .magnetic-cursor-main,
+  .magnetic-cursor-follower,
+  .magnetic-cursor-text,
   .magnetic-cursor,
   .cursor-follower,
   .cursor-text,
@@ -709,13 +981,13 @@ body::before {
     display: none !important;
   }
   
-  
+  /* Re-enable default cursors on mobile */
   button, a, input, textarea, select, .magnetic, .morph-btn {
     cursor: pointer !important;
   }
 }
 
-
+/* ===== ACCESSIBILITY FEATURES ===== */
 @media (prefers-reduced-motion: reduce) {
   .cinematic-text .char,
   .quantum-skill-item,
@@ -730,6 +1002,14 @@ body::before {
   }
   
   body::before {
+    animation: none !important;
+  }
+  
+  .domains-title {
+    animation: none !important;
+  }
+  
+  .logo-energy-ring {
     animation: none !important;
   }
 }
@@ -748,51 +1028,23 @@ body::before {
     border-color: #ff6b35;
     background: rgba(255, 107, 53, 0.2);
   }
+  
+  .quantum-domain-card {
+    border: 2px solid #ff6b35;
+  }
 }
 
-
+/* ===== FOCUS STATES FOR ACCESSIBILITY ===== */
 .nav-link:focus,
 .btn:focus,
-.morph-btn:focus {
+.morph-btn:focus,
+.quantum-portal-btn:focus {
   outline: 2px solid #ff6b35;
   outline-offset: 4px;
 }
 
-
-.board-section {
-  background: 
-    radial-gradient(circle at 20% 30%, rgba(255,107,53,0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(247,147,30,0.08) 0%, transparent 50%);
-}
-
-.board-member:hover .member-card {
-  transform: translateY(-15px) rotateX(8deg) rotateY(2deg);
-}
-
-
-.scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 0%;
-  height: 4px;
-  background: linear-gradient(90deg, #ff6b35, #f7931e);
-  z-index: 10001;
-  transition: width 0.1s ease;
-}
-
-
-.domains-section .magnetic-cursor {
+/* ===== SPECIAL DOMAIN CURSOR EFFECTS ===== */
+.domains-section .magnetic-cursor-main {
   background: radial-gradient(circle, #ff6b35, #f7931e);
   transform: scale(1.5);
-}
-
-
-.morphing-bg {
-  transition: background 8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.advanced-blur {
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }

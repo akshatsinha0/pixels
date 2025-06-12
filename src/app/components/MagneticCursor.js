@@ -7,16 +7,19 @@ export default function MagneticCursor() {
   const textRef = useRef(null)
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
+
     const cursor = cursorRef.current
     const follower = followerRef.current
     const cursorText = textRef.current
+
+    if (!cursor || !follower || !cursorText) return
 
     let mouseX = 0, mouseY = 0
     let cursorX = 0, cursorY = 0
     let followerX = 0, followerY = 0
 
     const updateCursor = () => {
-      // Smooth cursor movement
       cursorX += (mouseX - cursorX) * 0.2
       cursorY += (mouseY - cursorY) * 0.2
       
@@ -24,14 +27,15 @@ export default function MagneticCursor() {
       followerY += (mouseY - followerY) * 0.1
 
       if (cursor && follower) {
-        cursor.style.transform = `translate(${cursorX - 10}px, ${cursorY - 10}px)`
-        follower.style.transform = `translate(${followerX - 20}px, ${followerY - 20}px)`
+        cursor.style.transform = `translate3d(${cursorX - 10}px, ${cursorY - 10}px, 0)`
+        follower.style.transform = `translate3d(${followerX - 20}px, ${followerY - 20}px, 0)`
       }
 
       requestAnimationFrame(updateCursor)
     }
 
     const handleMouseMove = (e) => {
+      // Use clientX/Y instead of pageX/Y for ScrollSmoother compatibility
       mouseX = e.clientX
       mouseY = e.clientY
 
@@ -41,78 +45,68 @@ export default function MagneticCursor() {
       }
     }
 
-    const handleMouseEnter = (e) => {
-      const target = e.target
-      const text = target.getAttribute('data-cursor-text')
-      
-      if (cursor && follower) {
-        cursor.style.transform += ' scale(1.5)'
-        follower.style.transform += ' scale(1.8)'
-        follower.style.borderColor = '#ff6b35'
-        follower.style.backgroundColor = 'rgba(255, 107, 53, 0.1)'
-      }
-
-      if (text && cursorText) {
-        cursorText.textContent = text
-        cursorText.style.opacity = '1'
-        cursorText.style.transform = 'translateX(-50%) translateY(-100%) scale(1)'
-      }
-
-      // Magnetic effect for specific elements
-      if (target.classList.contains('magnetic')) {
-        const rect = target.getBoundingClientRect()
-        const centerX = rect.left + rect.width / 2
-        const centerY = rect.top + rect.height / 2
-        
-        target.style.transform = `translate(${(mouseX - centerX) * 0.1}px, ${(mouseY - centerY) * 0.1}px)`
-      }
-    }
-
-    const handleMouseLeave = (e) => {
-      const target = e.target
-      
-      if (cursor && follower) {
-        cursor.style.transform = cursor.style.transform.replace(' scale(1.5)', '')
-        follower.style.transform = follower.style.transform.replace(' scale(1.8)', '')
-        follower.style.borderColor = 'rgba(255, 107, 53, 0.3)'
-        follower.style.backgroundColor = 'transparent'
-      }
-
-      if (cursorText) {
-        cursorText.style.opacity = '0'
-        cursorText.style.transform = 'translateX(-50%) translateY(-100%) scale(0.8)'
-      }
-
-      if (target.classList.contains('magnetic')) {
-        target.style.transform = 'translate(0px, 0px)'
-      }
-    }
-
-    // Initialize
+    // Attach to document.body instead of document for better ScrollSmoother compatibility
+    document.body.addEventListener('mousemove', handleMouseMove, { passive: true })
     updateCursor()
-    document.addEventListener('mousemove', handleMouseMove)
-    
-    // Add event listeners to interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, .morph-btn, .project-card, .magnetic')
-    interactiveElements.forEach(el => {
-      el.addEventListener('mouseenter', handleMouseEnter)
-      el.addEventListener('mouseleave', handleMouseLeave)
-    })
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      interactiveElements.forEach(el => {
-        el.removeEventListener('mouseenter', handleMouseEnter)
-        el.removeEventListener('mouseleave', handleMouseLeave)
-      })
+      document.body.removeEventListener('mousemove', handleMouseMove)
     }
   }, [])
 
   return (
     <>
-      <div ref={cursorRef} className="magnetic-cursor"></div>
-      <div ref={followerRef} className="cursor-follower"></div>
-      <div ref={textRef} className="cursor-text"></div>
+      <div 
+        ref={cursorRef} 
+        className="magnetic-cursor-main"
+        style={{
+          position: 'fixed',
+          width: '20px',
+          height: '20px',
+          backgroundColor: '#ff6b35',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 2147483647,
+          mixBlendMode: 'difference',
+          willChange: 'transform',
+          top: 0,
+          left: 0
+        }}
+      />
+      <div 
+        ref={followerRef} 
+        className="magnetic-cursor-follower"
+        style={{
+          position: 'fixed',
+          width: '40px',
+          height: '40px',
+          border: '2px solid rgba(255, 107, 53, 0.3)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 2147483646,
+          willChange: 'transform',
+          top: 0,
+          left: 0
+        }}
+      />
+      <div 
+        ref={textRef} 
+        className="magnetic-cursor-text"
+        style={{
+          position: 'fixed',
+          background: 'rgba(255, 107, 53, 0.9)',
+          color: 'white',
+          padding: '0.5rem 1rem',
+          borderRadius: '20px',
+          fontSize: '0.8rem',
+          fontWeight: '600',
+          pointerEvents: 'none',
+          zIndex: 2147483645,
+          opacity: 0,
+          transform: 'translateX(-50%) translateY(-100%)',
+          transition: 'all 0.3s ease'
+        }}
+      />
     </>
   )
 }
