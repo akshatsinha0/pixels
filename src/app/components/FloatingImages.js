@@ -17,7 +17,7 @@ export default function FloatingImages() {
     `/home_sec_hov_images/${i + 1}.png`
   )
 
-  // Revolutionary ground flip physics calculation
+  
   const calculateGroundFlipPhysics = useCallback((index, mouseX, mouseY, imgElement) => {
     if (!imgElement) return {}
 
@@ -25,24 +25,24 @@ export default function FloatingImages() {
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
     
-    // Distance-based quantum field calculation
+    
     const distance = Math.sqrt(
       Math.pow(mouseX - centerX, 2) + 
       Math.pow(mouseY - centerY, 2)
     )
     
-    // Revolutionary physics: closer mouse = stronger flip force
+    
     const maxDistance = 400
     const normalizedDistance = Math.min(distance / maxDistance, 1)
     const flipIntensity = 1 - normalizedDistance
     
-    // Angular momentum calculation for realistic flip
-    const angle = Math.atan2(mouseY - centerY, mouseX - centerX)
-    const rotationForce = flipIntensity * 180 // Maximum 180deg flip
     
-    // 3D perspective calculation for depth illusion
+    const angle = Math.atan2(mouseY - centerY, mouseX - centerX)
+    const rotationForce = flipIntensity * 180 
+    
+    
     const perspectiveZ = flipIntensity * 150
-    const rotationX = flipIntensity * -90 // Flip from ground up
+    const rotationX = flipIntensity * -90 
     
     return {
       rotationX: rotationX,
@@ -55,7 +55,7 @@ export default function FloatingImages() {
     }
   }, [])
 
-  // Advanced magnetic field simulation
+  
   const calculateMagneticField = useCallback((mouseX, mouseY, imageElements) => {
     const magneticFields = {}
     
@@ -66,16 +66,16 @@ export default function FloatingImages() {
       const centerX = rect.left + rect.width / 2
       const centerY = rect.top + rect.height / 2
       
-      // Magnetic attraction/repulsion calculation
+      
       const dx = mouseX - centerX
       const dy = mouseY - centerY
       const distance = Math.sqrt(dx * dx + dy * dy)
       
-      // Quantum field strength with falloff
+      
       const fieldStrength = Math.max(0, 500 - distance) / 500
       const magneticForce = fieldStrength * 100
       
-      // Orbital mechanics simulation
+      
       const angle = Math.atan2(dy, dx)
       const orbitalRadius = 80 + (fieldStrength * 120)
       
@@ -96,14 +96,14 @@ export default function FloatingImages() {
     const initAdvancedFloatingSystem = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-      const { Physics2DPlugin } = await import('gsap/Physics2DPlugin') // Advanced physics
+      const { Physics2DPlugin } = await import('gsap/Physics2DPlugin') 
       
       gsap.registerPlugin(ScrollTrigger, Physics2DPlugin)
       
       const container = containerRef.current
       if (!container) return
 
-      // REVOLUTIONARY INITIAL STATE: Images lying flat on ground (face down)
+      
       imagesRef.current.forEach((img, index) => {
         if (img) {
           const randomX = Math.random() * (window.innerWidth - 120)
@@ -114,7 +114,7 @@ export default function FloatingImages() {
             x: randomX,
             y: randomY,
             rotation: randomRotation,
-            rotationX: -90, // LYING FLAT FACE DOWN (KEY INNOVATION)
+            rotationX: -90, 
             rotationY: 0,
             rotationZ: 0,
             scale: 0.6,
@@ -122,13 +122,13 @@ export default function FloatingImages() {
             transformOrigin: "center center",
             transformStyle: "preserve-3d",
             perspective: 1000,
-            z: -100, // Below ground level
+            z: -100, 
             filter: "blur(2px) brightness(0.3) contrast(0.8)"
           })
         }
       })
 
-      // ADVANCED MOUSE TRACKING WITH PREDICTION
+      
       let mouseTracker = { x: 0, y: 0, vx: 0, vy: 0 }
       let lastMouseTime = Date.now()
       
@@ -136,7 +136,7 @@ export default function FloatingImages() {
         const currentTime = Date.now()
         const deltaTime = currentTime - lastMouseTime
         
-        // Velocity calculation for prediction
+        
         mouseTracker.vx = (e.clientX - mouseTracker.x) / deltaTime
         mouseTracker.vy = (e.clientY - mouseTracker.y) / deltaTime
         
@@ -152,7 +152,7 @@ export default function FloatingImages() {
         })
 
         if (isHovering) {
-          // REVOLUTIONARY GROUND FLIP CALCULATION
+          
           imagesRef.current.forEach((img, index) => {
             if (!img) return
             
@@ -161,26 +161,26 @@ export default function FloatingImages() {
             
             if (!magneticField) return
             
-            // COMBINED PHYSICS: Ground flip + Magnetic attraction + Orbital mechanics
+            
             const combinedTransform = {
-              // Ground-to-front flip (MAIN INNOVATION)
-              rotationX: flipPhysics.rotationX + (flipPhysics.intensity * 90), // From -90 to 0 degrees
+              
+              rotationX: flipPhysics.rotationX + (flipPhysics.intensity * 90), 
               rotationY: flipPhysics.rotationY + (Math.sin(Date.now() * 0.001 + index) * 15),
               rotationZ: flipPhysics.rotationZ + magneticField.rotationalVelocity * 0.01,
               
-              // Magnetic positioning with orbital mechanics
+              
               x: magneticField.orbitalX + (Math.sin(Date.now() * 0.002 + index) * 20),
               y: magneticField.orbitalY + (Math.cos(Date.now() * 0.002 + index) * 15),
               z: flipPhysics.translateZ + (flipPhysics.intensity * 200),
               
-              // Dynamic scaling and visual effects
+              
               scale: flipPhysics.scale + (magneticField.fieldStrength * 0.3),
               opacity: flipPhysics.opacity + (magneticField.fieldStrength * 0.2),
               
-              // Advanced visual filters
+              
               filter: `blur(${2 - flipPhysics.intensity * 2}px) brightness(${0.3 + flipPhysics.intensity * 0.7}) contrast(${0.8 + flipPhysics.intensity * 0.4}) saturate(${0.5 + flipPhysics.intensity * 0.8})`,
               
-              // Quantum shadow effect
+              
               boxShadow: `
                 0 ${flipPhysics.translateZ * 0.3}px ${flipPhysics.translateZ * 0.6}px rgba(0,0,0,${0.1 + flipPhysics.intensity * 0.4}),
                 0 0 ${flipPhysics.intensity * 50}px rgba(255,107,53,${flipPhysics.intensity * 0.3}),
@@ -188,30 +188,30 @@ export default function FloatingImages() {
               `
             }
             
-            // GSAP ANIMATION WITH ADVANCED EASING
+            
             gsap.to(img, {
               ...combinedTransform,
               duration: 0.6 + (flipPhysics.intensity * 0.4),
               ease: flipPhysics.intensity > 0.5 ? "elastic.out(1, 0.3)" : "power2.out",
               transformOrigin: "center center",
-              force3D: true // GPU acceleration
+              force3D: true 
             })
           })
         }
       }
 
-      // HERO SECTION INTEGRATION WITH ADVANCED DETECTION
+      
       const heroSection = document.querySelector('#home')
       if (heroSection) {
         
-        // MOUSE ENTER: SPECTACULAR GROUND FLIP REVEAL
+        
         heroSection.addEventListener('mouseenter', () => {
           setIsHovering(true)
           
-          // Kill existing timelines
+          
           if (groundFlipTimelineRef.current) groundFlipTimelineRef.current.kill()
           
-          // REVOLUTIONARY GROUND FLIP TIMELINE
+          
           groundFlipTimelineRef.current = gsap.timeline({
             onComplete: () => setIsInitialized(true)
           })
@@ -219,30 +219,30 @@ export default function FloatingImages() {
           imagesRef.current.forEach((img, index) => {
             if (!img) return
             
-            const delay = index * 0.08 // Cascading reveal
+            const delay = index * 0.08 
             const randomIntensity = 0.3 + Math.random() * 0.7
             
             groundFlipTimelineRef.current.to(img, {
-              // MAIN GROUND FLIP EFFECT
-              rotationX: 0, // From -90 (lying down) to 0 (standing up)
-              rotationY: Math.random() * 30 - 15, // Subtle side rotation
-              rotationZ: Math.random() * 20 - 10, // Natural variation
               
-              // Emergence animation
-              y: `-=${50 + Math.random() * 100}`, // Rise from ground
-              z: 50 + Math.random() * 100, // Forward depth
+              rotationX: 0, 
+              rotationY: Math.random() * 30 - 15, 
+              rotationZ: Math.random() * 20 - 10, 
+              
+              
+              y: `-=${50 + Math.random() * 100}`, 
+              z: 50 + Math.random() * 100, 
               scale: 0.9 + Math.random() * 0.3,
               opacity: 0.7 + Math.random() * 0.3,
               
-              // Visual enhancement
+              
               filter: `blur(0px) brightness(${0.8 + randomIntensity * 0.4}) contrast(1.2) saturate(1.1)`,
               
-              // Advanced physics easing
+              
               duration: 1.2 + Math.random() * 0.8,
               ease: "elastic.out(1.2, 0.4)",
               force3D: true,
               
-              // Quantum shadow emergence
+              
               boxShadow: `
                 0 20px 60px rgba(0,0,0,0.3),
                 0 0 30px rgba(255,107,53,0.2),
@@ -252,20 +252,20 @@ export default function FloatingImages() {
           })
         })
 
-        // MOUSE LEAVE: GRACEFUL RETURN TO GROUND
+        
         heroSection.addEventListener('mouseleave', () => {
           setIsHovering(false)
           setIsInitialized(false)
           
-          // Kill floating timeline
+          
           if (floatingTimelineRef.current) floatingTimelineRef.current.kill()
           
-          // RETURN TO GROUND ANIMATION
+          
           gsap.to(imagesRef.current, {
-            rotationX: -90, // Return to lying flat
+            rotationX: -90, 
             rotationY: 0,
-            rotationZ: '+=360', // Final spin
-            z: -100, // Back below ground
+            rotationZ: '+=360', 
+            z: -100, 
             scale: 0.6,
             opacity: 0.1,
             filter: "blur(2px) brightness(0.3) contrast(0.8)",
@@ -276,15 +276,15 @@ export default function FloatingImages() {
           })
         })
 
-        // ADVANCED MOUSE MOVE WITH THROTTLING
+        
         let mouseMoveTimeout
         heroSection.addEventListener('mousemove', (e) => {
           if (mouseMoveTimeout) clearTimeout(mouseMoveTimeout)
-          mouseMoveTimeout = setTimeout(() => advancedMouseHandler(e), 16) // 60fps throttling
+          mouseMoveTimeout = setTimeout(() => advancedMouseHandler(e), 16) 
         })
       }
 
-      // AUTONOMOUS QUANTUM FIELD ANIMATION (when not hovering)
+      
       const quantumFieldAnimation = () => {
         if (!isHovering && !isInitialized) {
           imagesRef.current.forEach((img, index) => {
@@ -297,7 +297,7 @@ export default function FloatingImages() {
                 x: quantumX,
                 y: quantumY,
                 rotation: quantumRotation,
-                rotationX: -90 + (Math.random() * 20 - 10), // Subtle ground movement
+                rotationX: -90 + (Math.random() * 20 - 10), 
                 duration: 12 + Math.random() * 8,
                 ease: "none",
                 delay: index * 0.3
@@ -307,7 +307,7 @@ export default function FloatingImages() {
         }
       }
 
-      // PERFORMANCE-OPTIMIZED INTERVAL
+      
       const quantumInterval = setInterval(quantumFieldAnimation, 15000)
       
       return () => {
@@ -368,7 +368,7 @@ export default function FloatingImages() {
             priority={index < 3}
           />
           
-          {/* QUANTUM OVERLAY EFFECTS */}
+          {}
           <div
             className="quantum-overlay-primary"
             style={{
@@ -390,7 +390,7 @@ export default function FloatingImages() {
             }}
           />
           
-          {/* HOLOGRAPHIC SHIMMER EFFECT */}
+          {}
           <div
             className="holographic-shimmer"
             style={{
@@ -414,7 +414,7 @@ export default function FloatingImages() {
             }}
           />
           
-          {/* QUANTUM PARTICLES EFFECT */}
+          {}
           <div
             className="quantum-particles"
             style={{
@@ -436,7 +436,7 @@ export default function FloatingImages() {
         </div>
       ))}
 
-      {/* DYNAMIC CSS ANIMATIONS */}
+      {}
       <style jsx>{`
         @keyframes shimmer-0 { 0% { transform: translateX(-200%) rotate(0deg); } 100% { transform: translateX(200%) rotate(360deg); } }
         @keyframes shimmer-1 { 0% { transform: translateX(-200%) rotate(0deg); } 100% { transform: translateX(200%) rotate(320deg); } }
