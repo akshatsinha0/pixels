@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import gsap from 'gsap' 
 
 export default function BoardMembers() {
   const boardRef = useRef(null)
