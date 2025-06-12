@@ -35,7 +35,7 @@ export default function MagneticCursor() {
     }
 
     const handleMouseMove = (e) => {
-      // Use clientX/Y instead of pageX/Y for ScrollSmoother compatibility
+      
       mouseX = e.clientX
       mouseY = e.clientY
 
@@ -45,7 +45,7 @@ export default function MagneticCursor() {
       }
     }
 
-    // Attach to document.body instead of document for better ScrollSmoother compatibility
+    
     document.body.addEventListener('mousemove', handleMouseMove, { passive: true })
     updateCursor()
 
