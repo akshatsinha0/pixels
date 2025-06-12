@@ -20,6 +20,16 @@ export default function Home() {
   const mainRef = useRef(null)
 
   useEffect(() => {
+    const loadScrollToPlugin = async () => {
+      const { gsap } = await import("gsap");
+      const { ScrollToPlugin } = await import("gsap/ScrollToPlugin");
+      gsap.registerPlugin(ScrollToPlugin);
+    };
+
+    loadScrollToPlugin();
+  }, []);
+
+  useEffect(() => {
     const initializeInnovations = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
