@@ -15,6 +15,8 @@ import MagneticCursor from './components/MagneticCursor'
 import ParticleField from './components/ParticleField'
 import FloatingImages from './components/FloatingImages'
 
+
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const mainRef = useRef(null)
@@ -155,6 +157,8 @@ export default function Home() {
       
       {}
       <MagneticCursor />
+
+      
       
       {}
       <div id="smooth-wrapper">
