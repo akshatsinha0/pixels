@@ -1,4 +1,4 @@
-/* ===== RESET AND BASE STYLES ===== */
+
 * {
   margin: 0;
   padding: 0;
@@ -22,7 +22,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ===== CUSTOM CURSOR SYSTEM (FIXED) ===== */
+
 .magnetic-cursor {
   position: fixed !important;
   width: 20px;
@@ -64,7 +64,7 @@ body {
   backdrop-filter: blur(10px);
 }
 
-/* Legacy cursor classes for compatibility */
+
 .cursor {
   position: fixed !important;
   width: 20px;
@@ -77,26 +77,26 @@ body {
   transition: transform 0.2s ease;
 }
 
-/* ===== INTERACTIVE ELEMENTS CURSOR HANDLING ===== */
+
 button, a, input, textarea, select, .magnetic, .morph-btn, .quantum-domain-card, .project-card, .skill-orb, .nav-link {
   cursor: none !important;
   pointer-events: auto !important;
   position: relative;
 }
 
-/* Prevent cursor interference from non-interactive elements */
+
 img, video, iframe, .floating-particle, .quantum-particle, .skill-particle {
   pointer-events: none !important;
   cursor: none !important;
 }
 
-/* Section-level cursor inheritance */
+
 section, div, main, nav, footer, .floating-section, .domains-section, .about-section, .projects-section {
   cursor: none !important;
   pointer-events: auto;
 }
 
-/* ===== PRELOADER STYLES ===== */
+
 #preloader {
   position: fixed;
   top: 0;
@@ -141,7 +141,7 @@ section, div, main, nav, footer, .floating-section, .domains-section, .about-sec
   letter-spacing: 0.1em;
 }
 
-/* ===== SAVATE FONT CLASSES ===== */
+
 .savate-display {
   font-family: "Savate", sans-serif;
   font-optical-sizing: auto;
@@ -156,7 +156,7 @@ section, div, main, nav, footer, .floating-section, .domains-section, .about-sec
   font-style: normal;
 }
 
-/* ===== TYPOGRAPHY SYSTEM ===== */
+
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.2;
@@ -204,7 +204,7 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 600px;
 }
 
-/* ===== BUTTON SYSTEM ===== */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -242,7 +242,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
 }
 
-/* ===== MORPHING BUTTONS ===== */
+
 .morph-btn {
   position: relative;
   display: inline-flex;
@@ -287,7 +287,7 @@ h1, h2, h3, h4, h5, h6 {
   border-color: transparent;
 }
 
-/* ===== SECTION LAYOUTS ===== */
+
 .section {
   padding: 8rem 2rem;
   max-width: 1400px;
@@ -320,7 +320,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 2px;
 }
 
-/* ===== GRID SYSTEMS ===== */
+
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -334,7 +334,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 2rem;
 }
 
-/* ===== FLOATING SECTIONS ===== */
+
 .floating-section {
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px);
@@ -377,7 +377,7 @@ h1, h2, h3, h4, h5, h6 {
     0 0 100px rgba(255, 107, 53, 0.1);
 }
 
-/* ===== NAVIGATION STYLES ===== */
+
 .navigation {
   position: fixed;
   top: 0;
@@ -450,7 +450,7 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
 }
 
-/* ===== PROJECT CARDS ===== */
+
 .project-card {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 20px;
@@ -490,7 +490,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: translate(-50%, -50%);
 }
 
-/* ===== PARTICLE SYSTEMS ===== */
+
 .particle-field {
   position: fixed;
   top: 0;
@@ -516,7 +516,7 @@ h1, h2, h3, h4, h5, h6 {
   75% { transform: translateY(-10px) rotate(270deg); }
 }
 
-/* ===== GLITCH TEXT EFFECTS ===== */
+
 .glitch-text {
   position: relative;
   color: #ffffff;
@@ -557,7 +557,7 @@ h1, h2, h3, h4, h5, h6 {
   50% { opacity: 1; transform: translateX(2px); }
 }
 
-/* ===== BACKGROUND PATTERNS ===== */
+
 body::before {
   content: '';
   position: fixed;
@@ -582,7 +582,7 @@ body::before {
   75% { transform: translateX(-5px) translateY(5px); }
 }
 
-/* ===== SMOOTH SCROLLING CONTAINERS ===== */
+
 #smooth-wrapper {
   overflow: hidden;
 }
@@ -591,7 +591,7 @@ body::before {
   overflow: visible;
 }
 
-/* ===== FLOATING IMAGES SYSTEM ===== */
+
 .floating-images-container {
   pointer-events: none;
 }
@@ -607,7 +607,7 @@ body::before {
   box-shadow: 0 30px 60px rgba(255,107,53,0.4);
 }
 
-/* ===== ADVANCED TEXT REVEAL STYLES ===== */
+
 .line-wrapper {
   overflow: hidden;
   position: relative;
@@ -618,7 +618,7 @@ body::before {
   backface-visibility: hidden;
 }
 
-/* ===== QUANTUM EFFECTS ===== */
+
 .quantum-hover {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -645,13 +645,13 @@ body::before {
   left: 100%;
 }
 
-/* ===== SKILL SYSTEMS ===== */
+
 .quantum-skill-item {
   transform-style: preserve-3d;
   perspective: 1000px;
 }
 
-/* ===== TEXT SELECTION STYLING ===== */
+
 ::selection {
   background: rgba(255, 107, 53, 0.3);
   color: #ffffff;
@@ -662,7 +662,7 @@ body::before {
   color: #ffffff;
 }
 
-/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
 .gpu-accelerated {
   will-change: transform;
   transform: translateZ(0);
@@ -674,7 +674,7 @@ body::before {
   will-change: transform;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
+
 @media (max-width: 768px) {
   .section {
     padding: 4rem 1rem;
@@ -697,7 +697,7 @@ body::before {
     padding: 0 1rem;
   }
   
-  /* MOBILE CURSOR DISABLE */
+  
   body {
     cursor: auto !important;
   }
@@ -709,13 +709,13 @@ body::before {
     display: none !important;
   }
   
-  /* Re-enable default cursors on mobile */
+  
   button, a, input, textarea, select, .magnetic, .morph-btn {
     cursor: pointer !important;
   }
 }
 
-/* ===== ACCESSIBILITY FEATURES ===== */
+
 @media (prefers-reduced-motion: reduce) {
   .cinematic-text .char,
   .quantum-skill-item,
@@ -750,7 +750,7 @@ body::before {
   }
 }
 
-/* ===== FOCUS STATES FOR ACCESSIBILITY ===== */
+
 .nav-link:focus,
 .btn:focus,
 .morph-btn:focus {
@@ -758,7 +758,7 @@ body::before {
   outline-offset: 4px;
 }
 
-/* ===== BOARD MEMBERS SPECIFIC STYLES ===== */
+
 .board-section {
   background: 
     radial-gradient(circle at 20% 30%, rgba(255,107,53,0.08) 0%, transparent 50%),
@@ -769,7 +769,7 @@ body::before {
   transform: translateY(-15px) rotateX(8deg) rotateY(2deg);
 }
 
-/* ===== SCROLL PROGRESS INDICATOR ===== */
+
 .scroll-progress {
   position: fixed;
   top: 0;
@@ -781,13 +781,13 @@ body::before {
   transition: width 0.1s ease;
 }
 
-/* ===== DOMAIN SPECIFIC ENHANCEMENTS ===== */
+
 .domains-section .magnetic-cursor {
   background: radial-gradient(circle, #ff6b35, #f7931e);
   transform: scale(1.5);
 }
 
-/* ===== MORPHING BACKGROUNDS ===== */
+
 .morphing-bg {
   transition: background 8s cubic-bezier(0.4, 0, 0.2, 1);
 }
