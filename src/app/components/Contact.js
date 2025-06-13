@@ -22,24 +22,24 @@ export default function Contact() {
       
       gsap.registerPlugin(ScrollTrigger, MotionPathPlugin, DrawSVGPlugin)
 
-      // REVOLUTIONARY PEN WRITING ANIMATION
+      
       const penElement = penRef.current
       const textPath = textPathRef.current
       
       if (penElement && textPath) {
-        // Set initial pen position
+        
         gsap.set(penElement, {
           scale: 0,
           rotation: 45,
           transformOrigin: '50% 100%'
         })
 
-        // Set initial text path state
+        
         gsap.set('.text-path', {
           drawSVG: '0%'
         })
 
-        // MASTER TIMELINE FOR PEN WRITING ORCHESTRATION
+        
         const penWritingTimeline = gsap.timeline({
           scrollTrigger: {
             trigger: contactRef.current,
@@ -50,14 +50,14 @@ export default function Contact() {
           }
         })
 
-        // PEN MATERIALIZATION
+        
         penWritingTimeline
           .to(penElement, {
             scale: 1,
             duration: 0.8,
             ease: "elastic.out(1, 0.3)"
           })
-          // PEN MOVEMENT ALONG TEXT PATH WITH INK TRAIL
+          
           .to(penElement, {
             motionPath: {
               path: textPath,
@@ -68,13 +68,13 @@ export default function Contact() {
             duration: 6,
             ease: "none"
           }, "-=0.2")
-          // SIMULTANEOUS TEXT DRAWING
+          
           .to('.text-path', {
             drawSVG: '100%',
             duration: 6,
             ease: "none"
           }, "-=6")
-          // PEN FLOURISH EXIT
+          
           .to(penElement, {
             y: -50,
             rotation: 45 + 360,
@@ -85,7 +85,7 @@ export default function Contact() {
           })
       }
 
-      // QUANTUM FORM FIELD ANIMATIONS
+      
       const formFields = document.querySelectorAll('.quantum-form-field')
       formFields.forEach((field, index) => {
         gsap.fromTo(field,
@@ -112,7 +112,7 @@ export default function Contact() {
         )
       })
 
-      // CONTACT INFO HOLOGRAPHIC EMERGENCE
+      
       const contactInfo = document.querySelector('.contact-info-enhanced')
       if (contactInfo) {
         gsap.fromTo(contactInfo,
@@ -139,7 +139,7 @@ export default function Contact() {
         )
       }
 
-      // FLOATING CONTACT PARTICLES
+      
       const createContactParticles = () => {
         const container = document.querySelector('.contact-particles-bg')
         if (!container) return
@@ -182,7 +182,7 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // QUANTUM FORM SUBMISSION ANIMATION
+    
     const { gsap } = await import('gsap')
     const submitBtn = document.querySelector('.quantum-submit-btn')
     
@@ -195,7 +195,7 @@ export default function Contact() {
         ease: "power2.inOut"
       })
       
-      // Simulate form processing
+      
       gsap.to('.form-processing', {
         opacity: 1,
         duration: 0.3
@@ -244,7 +244,7 @@ export default function Contact() {
       <div className="cosmic-contact-overlay"></div>
       
       <div className="section">
-        {/* REVOLUTIONARY PEN WRITING TITLE */}
+        {}
         <div className="pen-writing-container">
           <svg
             width="100%"
@@ -252,7 +252,7 @@ export default function Contact() {
             viewBox="0 0 1200 200"
             className="pen-writing-svg"
           >
-            {/* TEXT PATH FOR PEN TO FOLLOW */}
+            {}
             <path
               ref={textPathRef}
               d="M50,150 Q100,50 150,100 Q200,150 250,100 Q300,50 350,120 Q400,180 450,120 Q500,60 550,130 Q600,190 650,130 Q700,70 750,140 Q800,200 850,140 Q900,80 950,150 Q1000,220 1050,150 Q1100,90 1150,160"
@@ -262,7 +262,7 @@ export default function Contact() {
               className="pen-path"
             />
             
-            {/* VISIBLE TEXT PATH THAT GETS DRAWN */}
+            {}
             <path
               d="M50,150 Q100,50 150,100 Q200,150 250,100 Q300,50 350,120 Q400,180 450,120 Q500,60 550,130 Q600,190 650,130 Q700,70 750,140 Q800,200 850,140 Q900,80 950,150 Q1000,220 1050,150 Q1100,90 1150,160"
               fill="none"
@@ -272,7 +272,7 @@ export default function Contact() {
               className="text-path"
             />
             
-            {/* INK GRADIENT DEFINITION */}
+            {}
             <defs>
               <linearGradient id="inkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#ff6b35" />
@@ -282,7 +282,7 @@ export default function Contact() {
             </defs>
           </svg>
           
-          {/* FOUNTAIN PEN ELEMENT */}
+          {}
           <div className="fountain-pen" ref={penRef}>
             <Image
               src="/fountainPen.png"
@@ -298,12 +298,12 @@ export default function Contact() {
             <div className="ink-trail"></div>
           </div>
           
-          {/* STATIC TEXT OVERLAY */}
+          {}
           <h2 className="pen-written-title savate-display">Let's Create Together</h2>
         </div>
 
         <div className="contact-grid quantum-layout">
-          {/* ENHANCED CONTACT INFO */}
+          {}
           <div className="contact-info-enhanced">
             <div className="info-hologram">
               <div className="hologram-lines"></div>
@@ -350,7 +350,7 @@ export default function Contact() {
             </div>
           </div>
           
-          {/* QUANTUM ENHANCED FORM */}
+          {}
           <div className="quantum-form-container">
             <form onSubmit={handleSubmit} className="quantum-contact-form">
               <div className="form-processing">Processing your vision...</div>
