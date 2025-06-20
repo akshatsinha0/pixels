@@ -20,6 +20,60 @@ export default function Domains() {
       const domainCards = document.querySelectorAll('.quantum-domain-card')
       const domainLogos = document.querySelectorAll('.domain-logo')
       
+      // REVOLUTIONARY QUANTUM CONVERGENCE ANIMATION
+      const initQuantumCardConvergence = () => {
+        const masterTimeline = gsap.timeline()
+        domainCards.forEach((card, index) => {
+          const delay = index * 0.3
+          const logo = card.querySelector('.domain-logo')
+          // PHASE 1: Quantum teleportation to position
+          masterTimeline.to(card, {
+            x: 0,
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            rotation: 0,
+            rotationX: 0,
+            rotationY: 0,
+            z: 0,
+            duration: 2.5,
+            ease: "power4.out",
+            delay: delay,
+            onComplete: () => {
+              // Add floating animation
+              gsap.to(card, {
+                y: "random(-15, 15)",
+                rotation: "random(-2, 2)",
+                duration: "random(3, 5)",
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+              })
+            }
+          }, 0)
+          // PHASE 2: Logo materialization with quantum effects
+          if (logo) {
+            masterTimeline.to(logo, {
+              scale: 1,
+              rotation: 0,
+              opacity: 1,
+              filter: 'blur(0px) brightness(1)',
+              duration: 1.8,
+              ease: "elastic.out(1, 0.3)",
+              delay: delay + 0.5
+            }, 0)
+          }
+          // PHASE 3: Particle burst effect on arrival
+          masterTimeline.call(() => {
+            createCardParticleBurst(card)
+          }, null, delay + 1)
+          // PHASE 4: Holographic scan effect
+          masterTimeline.call(() => {
+            createHolographicScan(card)
+          }, null, delay + 1.5)
+        })
+      }
+
       // Initialize cards in quantum field (scattered across space-time)
       domainCards.forEach((card, index) => {
         const angle = (index / domainCards.length) * Math.PI * 2
@@ -68,65 +122,6 @@ export default function Domains() {
         },
         onLeaveBack: () => setIsInView(false)
       })
-
-      // REVOLUTIONARY QUANTUM CONVERGENCE ANIMATION
-      const initQuantumCardConvergence = () => {
-        const masterTimeline = gsap.timeline()
-
-        domainCards.forEach((card, index) => {
-          const delay = index * 0.3
-          const logo = card.querySelector('.domain-logo')
-          
-          // PHASE 1: Quantum teleportation to position
-          masterTimeline.to(card, {
-            x: 0,
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            rotation: 0,
-            rotationX: 0,
-            rotationY: 0,
-            z: 0,
-            duration: 2.5,
-            ease: "power4.out",
-            delay: delay,
-            onComplete: () => {
-              // Add floating animation
-              gsap.to(card, {
-                y: "random(-15, 15)",
-                rotation: "random(-2, 2)",
-                duration: "random(3, 5)",
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-              })
-            }
-          }, 0)
-
-          // PHASE 2: Logo materialization with quantum effects
-          if (logo) {
-            masterTimeline.to(logo, {
-              scale: 1,
-              rotation: 0,
-              opacity: 1,
-              filter: 'blur(0px) brightness(1)',
-              duration: 1.8,
-              ease: "elastic.out(1, 0.3)",
-              delay: delay + 0.5
-            }, 0)
-          }
-
-          // PHASE 3: Particle burst effect on arrival
-          masterTimeline.call(() => {
-            createCardParticleBurst(card)
-          }, null, delay + 1)
-
-          // PHASE 4: Holographic scan effect
-          masterTimeline.call(() => {
-            createHolographicScan(card)
-          }, null, delay + 1.5)
-        })
-      }
 
       // PARTICLE BURST SYSTEM
       const createCardParticleBurst = (card) => {

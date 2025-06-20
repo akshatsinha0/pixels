@@ -61,7 +61,9 @@ export default function Hero() {
         })
       }
 
-      heroRef.current.addEventListener('mousemove', handleMouseMove)
+      if (heroRef.current) {
+        heroRef.current.addEventListener('mousemove', handleMouseMove)
+      }
 
       return () => {
         if (heroRef.current) {

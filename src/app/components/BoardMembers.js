@@ -1,24 +1,36 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
-import gsap from 'gsap' 
+import { gsap } from "gsap";
+import React from 'react';
 
 export default function BoardMembers() {
   const boardRef = useRef(null)
   const timelineRef = useRef(null)
   const [selectedMember, setSelectedMember] = useState(null)
   const [detailCard, setDetailCard] = useState(null)
+  const cardRefs = useRef([])
+
+  const ANIMATION_CONFIG = {
+    SMOOTH_DURATION: 600,
+    INITIAL_DURATION: 1500,
+    INITIAL_X_OFFSET: 70,
+    INITIAL_Y_OFFSET: 60,
+  }
+
+  const clamp = (value, min = 0, max = 100) => Math.min(Math.max(value, min), max)
+  const round = (value, precision = 3) => parseFloat(value.toFixed(precision))
+  const adjust = (value, fromMin, fromMax, toMin, toMax) => 
+    round(toMin + ((toMax - toMin) * (value - fromMin)) / (fromMax - fromMin))
+  const easeInOutCubic = (x) => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
 
   useEffect(() => {
     const initGodLevelBoardAnimations = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-      const { MorphSVGPlugin } = await import('gsap/MorphSVGPlugin')
-      const { Physics2DPlugin } = await import('gsap/Physics2DPlugin')
       
-      gsap.registerPlugin(ScrollTrigger, MorphSVGPlugin, Physics2DPlugin)
+      gsap.registerPlugin(ScrollTrigger)
 
-      
       gsap.fromTo('.central-timeline', 
         {
           scaleY: 0,
@@ -38,7 +50,6 @@ export default function BoardMembers() {
         }
       )
 
-      
       const leftMembers = document.querySelectorAll('.board-member.left')
       const rightMembers = document.querySelectorAll('.board-member.right')
 
@@ -104,7 +115,6 @@ export default function BoardMembers() {
         )
       })
 
-      
       ScrollTrigger.create({
         trigger: boardRef.current,
         start: 'top bottom',
@@ -133,7 +143,6 @@ export default function BoardMembers() {
         }
       })
 
-      
       const createQuantumParticles = () => {
         const container = document.querySelector('.quantum-particles-bg')
         if (!container) return
@@ -173,7 +182,6 @@ export default function BoardMembers() {
     initGodLevelBoardAnimations()
   }, [])
 
-  
   const handleMemberClick = (member, event) => {
     const clickedElement = event.currentTarget
     const rect = clickedElement.getBoundingClientRect()
@@ -185,7 +193,6 @@ export default function BoardMembers() {
       clickPosition: rect.top + window.pageYOffset
     })
 
-    
     setTimeout(() => {
       const detailCardElement = document.querySelector('.detail-card')
       if (detailCardElement) {
@@ -226,6 +233,102 @@ export default function BoardMembers() {
       })
     }
   }
+
+  const updateCardTransform = useCallback((offsetX, offsetY, card, wrap) => {
+    if (!card || !wrap) return
+    
+    const width = card.clientWidth
+    const height = card.clientHeight
+
+    const percentX = clamp((100 / width) * offsetX)
+    const percentY = clamp((100 / height) * offsetY)
+
+    const centerX = percentX - 50
+    const centerY = percentY - 50
+
+    const properties = {
+      "--pointer-x": `${percentX}%`,
+      "--pointer-y": `${percentY}%`,
+      "--background-x": `${adjust(percentX, 0, 100, 35, 65)}%`,
+      "--background-y": `${adjust(percentY, 0, 100, 35, 65)}%`,
+      "--pointer-from-center": `${clamp(Math.hypot(percentY - 50, percentX - 50) / 50, 0, 1)}`,
+      "--pointer-from-top": `${percentY / 100}`,
+      "--pointer-from-left": `${percentX / 100}`,
+      "--rotate-x": `${round(-(centerX / 5))}deg`,
+      "--rotate-y": `${round(centerY / 4)}deg`,
+      "--card-opacity": "1"
+    }
+
+    Object.entries(properties).forEach(([property, value]) => {
+      wrap.style.setProperty(property, value)
+    })
+  }, [])
+
+  const handlePointerMove = useCallback((event, index) => {
+    const card = cardRefs.current[index]?.cardRef?.current
+    const wrap = cardRefs.current[index]?.wrapRef?.current
+    
+    if (!card || !wrap) return
+    
+    const rect = card.getBoundingClientRect()
+    updateCardTransform(
+      event.clientX - rect.left,
+      event.clientY - rect.top,
+      card,
+      wrap
+    )
+  }, [updateCardTransform])
+
+  const handlePointerEnter = useCallback((index) => {
+    const card = cardRefs.current[index]?.cardRef?.current
+    const wrap = cardRefs.current[index]?.wrapRef?.current
+    
+    if (!card || !wrap) return
+    
+    wrap.classList.add("active")
+    card.classList.add("active")
+  }, [])
+
+  const handlePointerLeave = useCallback((event, index) => {
+    const card = cardRefs.current[index]?.cardRef?.current
+    const wrap = cardRefs.current[index]?.wrapRef?.current
+    
+    if (!card || !wrap) return
+    
+    const createSmoothAnimation = (duration, startX, startY) => {
+      const startTime = performance.now()
+      const targetX = wrap.clientWidth / 2
+      const targetY = wrap.clientHeight / 2
+
+      const animationLoop = (currentTime) => {
+        const elapsed = currentTime - startTime
+        const progress = clamp(elapsed / duration)
+        const easedProgress = easeInOutCubic(progress)
+
+        const currentX = adjust(easedProgress, 0, 1, startX, targetY)
+        const currentY = adjust(easedProgress, 0, 1, startY, targetY)
+
+        updateCardTransform(currentX, currentY, card, wrap)
+
+        if (progress < 1) {
+          requestAnimationFrame(animationLoop)
+        } else {
+          wrap.style.setProperty("--card-opacity", "0")
+        }
+      }
+
+      requestAnimationFrame(animationLoop)
+    }
+    
+    createSmoothAnimation(
+      ANIMATION_CONFIG.SMOOTH_DURATION,
+      event.offsetX,
+      event.offsetY
+    )
+    
+    wrap.classList.remove("active")
+    card.classList.remove("active")
+  }, [ANIMATION_CONFIG.SMOOTH_DURATION, updateCardTransform])
 
   const boardMembers = [
     {
@@ -320,13 +423,20 @@ export default function BoardMembers() {
     }
   ]
 
+  // Ensure refs array matches the number of members
+  if (cardRefs.current.length !== boardMembers.length) {
+    cardRefs.current = boardMembers.map(
+      (_, i) => cardRefs.current[i] || { wrapRef: React.createRef(), cardRef: React.createRef() }
+    )
+  }
+
   return (
     <section id="board-members" className="board-section" ref={boardRef}>
       <div className="quantum-particles-bg"></div>
       <div className="cosmic-gradient-overlay"></div>
       
       <div className="section">
-        <h2 className="section-title savate-display">Members of the Board</h2>
+        <h2 className="section-title savate-display">Quantum Leadership Collective</h2>
         
         <div className="board-timeline-container">
           <div className="central-timeline" ref={timelineRef}>
@@ -349,48 +459,97 @@ export default function BoardMembers() {
                 onClick={(e) => handleMemberClick(member, e)}
                 style={{ top: `${index * 180}px` }}
               >
-                <div className="member-card floating-section hyperdimensional">
-                  <div className="quantum-field-bg"></div>
-                  <div className="holographic-overlay"></div>
-                  
-                  <div className="member-image-container">
-                    <div className="image-frame quantum-border">
-                      <Image
-                        src={member.image}
-                        alt={member.name}
-                        width={200}
-                        height={200}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          borderRadius: '50%'
-                        }}
-                      />
-                      <div className="image-glow"></div>
+                <div 
+                  ref={cardRefs.current[index].wrapRef}
+                  className="pc-card-wrapper member-card-wrapper"
+                >
+                  <div 
+                    ref={cardRefs.current[index].cardRef}
+                    className="pc-card member-card"
+                    onPointerMove={(e) => handlePointerMove(e, index)}
+                    onPointerEnter={() => handlePointerEnter(index)}
+                    onPointerLeave={(e) => handlePointerLeave(e, index)}
+                  >
+                    <div className="pc-inside">
+                      <div className="pc-shine"></div>
+                      <div className="pc-glare"></div>
+                      <div className="vertical-line-container">
+                        <div className="vertical-line">
+                          <div className="line-core"></div>
+                          <div className="line-glow"></div>
+                          <div className="line-particles"></div>
+                        </div>
+                      </div>
+                      
+                      <div className="member-content">
+                        <div className="member-image-container">
+                          <div className="image-frame quantum-border">
+                            <Image
+                              src={member.image}
+                              alt={member.name}
+                              width={200}
+                              height={200}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: '50%'
+                              }}
+                            />
+                            <div className="image-glow"></div>
+                            <div className="image-pulse-ring"></div>
+                          </div>
+                          <div className="member-aura"></div>
+                          <div className="orbital-rings">
+                            <div className="ring ring-1"></div>
+                            <div className="ring ring-2"></div>
+                            <div className="ring ring-3"></div>
+                          </div>
+                        </div>
+                        
+                        <div className="member-info quantum-text">
+                          <h3 className="member-name savate-display">{member.name}</h3>
+                          <p className="member-position savate-body">{member.position}</p>
+                          <div className="position-badge">
+                            <div className="badge-glow"></div>
+                            <span className="badge-text">{member.position}</span>
+                          </div>
+                          <div className="interaction-hint">
+                            <span className="hint-text">Click to Explore</span>
+                            <div className="hint-arrow">→</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="pc-user-info">
+                        <div className="pc-user-details">
+                          <div className="pc-mini-avatar">
+                            <Image
+                              src={member.image}
+                              alt={member.name}
+                              width={48}
+                              height={48}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: '50%'
+                              }}
+                            />
+                          </div>
+                          <div className="pc-user-text">
+                            <div className="pc-handle">{member.name}</div>
+                            <div className="pc-status">{member.position}</div>
+                          </div>
+                        </div>
+                        <button className="pc-contact-btn" onClick={(e) => {
+                          e.stopPropagation()
+                          handleMemberClick(member, e)
+                        }}>
+                          View Profile
+                        </button>
+                      </div>
                     </div>
-                    <div className="member-aura"></div>
-                    <div className="orbital-rings">
-                      <div className="ring ring-1"></div>
-                      <div className="ring ring-2"></div>
-                      <div className="ring ring-3"></div>
-                    </div>
-                  </div>
-                  
-                  <div className="member-info quantum-text">
-                    <h3 className="member-name savate-display">{member.name}</h3>
-                    <p className="member-position savate-body">{member.position}</p>
-                    <div className="position-badge">
-                      <div className="badge-glow"></div>
-                      <span className="badge-text">{member.position}</span>
-                    </div>
-                    <div className="member-connector quantum-connector"></div>
-                    <div className="interaction-hint">Click to Explore</div>
-                  </div>
-                  
-                  <div className="card-effects">
-                    <div className="particle-trail"></div>
-                    <div className="energy-pulse"></div>
                   </div>
                 </div>
               </div>
@@ -399,7 +558,6 @@ export default function BoardMembers() {
         </div>
       </div>
 
-      {}
       {detailCard && (
         <div 
           className="detail-card-overlay"
@@ -408,6 +566,7 @@ export default function BoardMembers() {
           <div className="detail-card hyperdimensional">
             <button className="close-btn quantum-btn" onClick={closeDetailCard}>
               <span>×</span>
+              <div className="close-ripple"></div>
             </button>
             
             <div className="detail-content">
@@ -453,7 +612,7 @@ export default function BoardMembers() {
                 <div className="quote-section">
                   <blockquote className="member-quote">
                     <span className="quote-mark">"</span>
-                    {detailCard.quote}
+                    {detailCard.quote.replace(/"/g, '')}
                     <span className="quote-mark">"</span>
                   </blockquote>
                 </div>
@@ -469,6 +628,32 @@ export default function BoardMembers() {
       )}
 
       <style jsx>{`
+        :root {
+          --pointer-x: 50%;
+          --pointer-y: 50%;
+          --pointer-from-center: 0;
+          --pointer-from-top: 0.5;
+          --pointer-from-left: 0.5;
+          --card-opacity: 0;
+          --rotate-x: 0deg;
+          --rotate-y: 0deg;
+          --background-x: 50%;
+          --background-y: 50%;
+          --sunpillar-1: hsl(2, 100%, 73%);
+          --sunpillar-2: hsl(53, 100%, 69%);
+          --sunpillar-3: hsl(93, 100%, 69%);
+          --sunpillar-4: hsl(176, 100%, 76%);
+          --sunpillar-5: hsl(228, 100%, 74%);
+          --sunpillar-6: hsl(283, 100%, 73%);
+          --sunpillar-clr-1: var(--sunpillar-1);
+          --sunpillar-clr-2: var(--sunpillar-2);
+          --sunpillar-clr-3: var(--sunpillar-3);
+          --sunpillar-clr-4: var(--sunpillar-4);
+          --sunpillar-clr-5: var(--sunpillar-5);
+          --sunpillar-clr-6: var(--sunpillar-6);
+          --card-radius: 30px;
+        }
+
         .board-section {
           padding: 12rem 0;
           position: relative;
@@ -660,96 +845,278 @@ export default function BoardMembers() {
         }
 
         .quantum-enhanced:hover {
-          transform: translateY(-20px) rotateX(10deg) rotateY(5deg) scale(1.03);
           z-index: 10;
         }
 
-        .member-card {
+        .pc-card-wrapper {
+          perspective: 1000px;
+          transform: translate3d(0, 0, 0.1px);
+          position: relative;
+          touch-action: none;
+          width: 100%;
+        }
+
+        .pc-card-wrapper::before {
+          content: '';
+          position: absolute;
+          inset: -10px;
+          background: inherit;
+          background-position: inherit;
+          border-radius: inherit;
+          transition: all 0.5s ease;
+          filter: contrast(2) saturate(2) blur(36px);
+          transform: scale(0.8) translate3d(0, 0, 0.1px);
+          background-size: 100% 100%;
+          background-image: radial-gradient(farthest-side circle at var(--pointer-x) var(--pointer-y), hsla(266, 100%, 90%, var(--card-opacity)) 4%, hsla(266, 50%, 80%, calc(var(--card-opacity) * 0.75)) 10%, hsla(266, 25%, 70%, calc(var(--card-opacity) * 0.5)) 50%, hsla(266, 0%, 60%, 0) 100%);
+        }
+
+        .pc-card-wrapper:hover,
+        .pc-card-wrapper.active {
+          --card-opacity: 1;
+        }
+
+        .pc-card-wrapper:hover::before,
+        .pc-card-wrapper.active::before {
+          filter: contrast(1) saturate(2) blur(40px) opacity(1);
+          transform: scale(0.9) translate3d(0, 0, 0.1px);
+        }
+
+        .pc-card {
           display: flex;
           align-items: center;
           gap: 3rem;
           padding: 3rem;
           background: rgba(255,255,255,0.02);
           backdrop-filter: blur(30px);
-          border-radius: 30px;
+          border-radius: var(--card-radius);
           border: 2px solid rgba(255,107,53,0.3);
-          transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-          transform-style: preserve-3d;
           position: relative;
+          background-blend-mode: color-dodge, normal, normal, normal;
+          animation: glow-bg 12s linear infinite;
+          box-shadow: rgba(0, 0, 0, 0.8) calc((var(--pointer-from-left) * 10px) - 3px) calc((var(--pointer-from-top) * 20px) - 6px) 20px -5px;
+          transition: transform 1s ease;
+          transform: translate3d(0, 0, 0.1px) rotateX(0deg) rotateY(0deg);
           overflow: hidden;
         }
 
-        .hyperdimensional {
-          box-shadow: 
-            0 20px 80px rgba(0,0,0,0.4),
-            0 0 100px rgba(255,107,53,0.2),
-            inset 0 0 50px rgba(255,255,255,0.03);
-        }
-
-        .board-member.right .member-card {
+        .board-member.right .pc-card {
           flex-direction: row-reverse;
           text-align: right;
         }
 
-        .member-card:hover {
+        .pc-card:hover,
+        .pc-card.active {
+          transition: none;
+          transform: translate3d(0, 0, 0.1px) rotateX(var(--rotate-y)) rotateY(var(--rotate-x));
           background: rgba(255,255,255,0.08);
           border-color: rgba(255,107,53,0.8);
           box-shadow: 
-            0 40px 120px rgba(0,0,0,0.5),
-            0 0 150px rgba(255,107,53,0.4),
-            inset 0 0 80px rgba(255,255,255,0.08);
+            0 50px 150px rgba(0,0,0,0.6),
+            0 0 200px rgba(255,107,53,0.5),
+            inset 0 0 100px rgba(255,255,255,0.1);
         }
 
-        .quantum-field-bg {
-          position: absolute;
-          top: -50%;
-          left: -50%;
-          width: 200%;
-          height: 200%;
-          background: conic-gradient(from 0deg, 
-            transparent, 
-            rgba(255,107,53,0.1), 
-            transparent, 
-            rgba(247,147,30,0.1), 
-            transparent);
-          animation: quantumField 10s linear infinite;
-          opacity: 0;
-          transition: opacity 0.5s ease;
-        }
-
-        .member-card:hover .quantum-field-bg {
-          opacity: 1;
-        }
-
-        @keyframes quantumField {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        .holographic-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
+        .pc-inside {
+          position: relative;
           width: 100%;
           height: 100%;
-          background: linear-gradient(45deg, 
-            transparent, 
-            rgba(0,255,255,0.1), 
-            transparent, 
-            rgba(255,0,255,0.1), 
-            transparent);
+          border-radius: var(--card-radius);
+          transform: translate3d(0, 0, 0.01px);
+          overflow: hidden;
+        }
+
+        .pc-shine {
+          position: absolute;
+          inset: 0;
+          border-radius: var(--card-radius);
+          transform: translate3d(0, 0, 1px);
+          overflow: hidden;
+          z-index: 3;
+          background: transparent;
+          background-size: cover;
+          background-position: center;
+          background-image: repeating-linear-gradient(0deg, var(--sunpillar-clr-1) calc(5% * 1), var(--sunpillar-clr-2) calc(5% * 2), var(--sunpillar-clr-3) calc(5% * 3), var(--sunpillar-clr-4) calc(5% * 4), var(--sunpillar-clr-5) calc(5% * 5), var(--sunpillar-clr-6) calc(5% * 6), var(--sunpillar-clr-1) calc(5% * 7)), repeating-linear-gradient(-45deg, #0e152e 0%, hsl(180, 10%, 60%) 3.8%, hsl(180, 29%, 66%) 4.5%, hsl(180, 10%, 60%) 5.2%, #0e152e 10%, #0e152e 12%), radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y), hsla(0, 0%, 0%, 0.1) 12%, hsla(0, 0%, 0%, 0.15) 20%, hsla(0, 0%, 0%, 0.25) 120%);
+          background-position: 0 var(--background-y), var(--background-x) var(--background-y), center;
+          background-blend-mode: color, hard-light;
+          background-size: 500% 500%, 300% 300%, 200% 200%;
+          background-repeat: repeat;
+          transition: filter 0.6s ease;
+          filter: brightness(0.66) contrast(1.33) saturate(0.33) opacity(0.5);
+          animation: holo-bg 18s linear infinite;
+          mix-blend-mode: color-dodge;
+        }
+
+        .pc-shine::before,
+        .pc-shine::after {
+          content: '';
+          background-position: center;
+          background-size: cover;
+          position: absolute;
+          inset: 0;
           opacity: 0;
           transition: opacity 0.3s ease;
         }
 
-        .member-card:hover .holographic-overlay {
-          opacity: 1;
-          animation: hologramShift 2s ease-in-out infinite;
+        .pc-card:hover .pc-shine,
+        .pc-card.active .pc-shine {
+          filter: brightness(0.85) contrast(1.5) saturate(0.5);
+          animation: none;
         }
 
-        @keyframes hologramShift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+        .pc-card:hover .pc-shine::before,
+        .pc-card.active .pc-shine::before,
+        .pc-card:hover .pc-shine::after,
+        .pc-card.active .pc-shine::after {
+          opacity: 1;
+        }
+
+        .pc-shine::before {
+          background-image: linear-gradient(45deg, var(--sunpillar-4), var(--sunpillar-5), var(--sunpillar-6), var(--sunpillar-1), var(--sunpillar-2), var(--sunpillar-3)), radial-gradient(circle at var(--pointer-x) var(--pointer-y), hsl(0, 0%, 70%) 0%, hsla(0, 0%, 30%, 0.2) 90%);
+          background-size: 250% 250%, 100% 100%;
+          background-position: var(--pointer-x) var(--pointer-y), center;
+          background-blend-mode: color-dodge;
+          filter: brightness(calc(2 - var(--pointer-from-center))) contrast(calc(var(--pointer-from-center) + 2)) saturate(calc(0.5 + var(--pointer-from-center)));
+          mix-blend-mode: luminosity;
+        }
+
+        .pc-shine::after {
+          background-position: 0 var(--background-y), calc(var(--background-x) * 0.4) calc(var(--background-y) * 0.5), center;
+          background-size: 200% 300%, 700% 700%, 100% 100%;
+          mix-blend-mode: difference;
+          filter: brightness(0.8) contrast(1.5);
+        }
+
+        .pc-glare {
+          position: absolute;
+          inset: 0;
+          border-radius: var(--card-radius);
+          transform: translate3d(0, 0, 1.1px);
+          overflow: hidden;
+          background-image: radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y), hsl(248, 25%, 80%) 12%, hsla(207, 40%, 30%, 0.8) 90%);
+          mix-blend-mode: overlay;
+          filter: brightness(0.8) contrast(1.2);
+          z-index: 4;
+        }
+
+        .vertical-line-container {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          z-index: 5;
+        }
+
+        .board-member.left .vertical-line-container {
+          right: 0;
+        }
+
+        .board-member.right .vertical-line-container {
+          left: 0;
+        }
+
+        .vertical-line {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 100%;
+          transform: scaleY(0);
+          transform-origin: center top;
+          transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pc-card:hover .vertical-line,
+        .pc-card.active .vertical-line {
+          transform: scaleY(1);
+        }
+
+        .line-core {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 100%;
+          background: linear-gradient(to bottom, 
+            transparent, 
+            #ff6b35, 
+            #f7931e, 
+            #ff6b35, 
+            transparent);
+          animation: linePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes linePulse {
+          0%, 100% { 
+            background: linear-gradient(to bottom, 
+              transparent, 
+              #ff6b35, 
+              #f7931e, 
+              #ff6b35, 
+              transparent);
+          }
+          50% { 
+            background: linear-gradient(to bottom, 
+              transparent, 
+              #ff8f35, 
+              #ffb01e, 
+              #ff8f35, 
+              transparent);
+          }
+        }
+
+        .line-glow {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 50%;
+          width: 15px;
+          transform: translateX(-50%);
+          background: linear-gradient(to bottom, 
+            transparent, 
+            rgba(255,107,53,0.5), 
+            rgba(247,147,30,0.5), 
+            rgba(255,107,53,0.5), 
+            transparent);
+          filter: blur(5px);
+        }
+
+        .line-particles {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .line-particles::before {
+          content: '';
+          position: absolute;
+          width: 2px;
+          height: 10px;
+          background: #fff;
+          border-radius: 50%;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          box-shadow: 0 0 10px #fff, 0 0 20px #ff6b35;
+          animation: particleRise 3s linear infinite;
+        }
+
+        @keyframes particleRise {
+          0% { top: 100%; opacity: 1; }
+          100% { top: 0%; opacity: 0; }
+        }
+
+        .member-content {
+          display: flex;
+          align-items: center;
+          gap: 3rem;
+          width: 100%;
+          position: relative;
+          z-index: 5;
+        }
+
+        .board-member.right .member-content {
+          flex-direction: row-reverse;
+          text-align: right;
         }
 
         .member-image-container {
@@ -774,7 +1141,8 @@ export default function BoardMembers() {
             inset 0 0 20px rgba(255,255,255,0.1);
         }
 
-        .member-card:hover .image-frame {
+        .pc-card:hover .image-frame,
+        .pc-card.active .image-frame {
           transform: scale(1.1) rotateZ(5deg);
           border-color: rgba(255,107,53,1);
           box-shadow: 
@@ -795,7 +1163,8 @@ export default function BoardMembers() {
           transition: opacity 0.3s ease;
         }
 
-        .member-card:hover .image-glow {
+        .pc-card:hover .image-glow,
+        .pc-card.active .image-glow {
           opacity: 1;
           animation: imageGlow 2s ease-in-out infinite;
         }
@@ -803,6 +1172,29 @@ export default function BoardMembers() {
         @keyframes imageGlow {
           0%, 100% { transform: scale(1); opacity: 0.4; }
           50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .image-pulse-ring {
+          position: absolute;
+          top: -5px;
+          left: -5px;
+          right: -5px;
+          bottom: -5px;
+          border: 2px solid rgba(255,107,53,0.5);
+          border-radius: 50%;
+          opacity: 0;
+          transform: scale(0.8);
+        }
+
+        .pc-card:hover .image-pulse-ring,
+        .pc-card.active .image-pulse-ring {
+          animation: pulsate 2s ease-out infinite;
+          opacity: 1;
+        }
+
+        @keyframes pulsate {
+          0% { transform: scale(0.8); opacity: 1; }
+          100% { transform: scale(1.5); opacity: 0; }
         }
 
         .member-aura {
@@ -943,24 +1335,6 @@ export default function BoardMembers() {
           font-size: 0.9rem;
         }
 
-        .quantum-connector {
-          position: absolute;
-          width: 60px;
-          height: 3px;
-          background: linear-gradient(to right, #ff6b35, #f7931e);
-          top: 50%;
-          transform: translateY(-50%);
-          box-shadow: 0 0 10px rgba(255,107,53,0.6);
-        }
-
-        .board-member.left .quantum-connector {
-          right: -65px;
-        }
-
-        .board-member.right .quantum-connector {
-          left: -65px;
-        }
-
         .interaction-hint {
           font-size: 0.8rem;
           color: rgba(255,107,53,0.7);
@@ -969,11 +1343,20 @@ export default function BoardMembers() {
           transition: all 0.3s ease;
           text-transform: uppercase;
           letter-spacing: 0.1em;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
         }
 
-        .member-card:hover .interaction-hint {
+        .pc-card:hover .interaction-hint,
+        .pc-card.active .interaction-hint {
           opacity: 1;
           animation: hintPulse 2s ease-in-out infinite;
+        }
+
+        .hint-arrow {
+          font-size: 1.2rem;
+          animation: arrowBounce 1s ease-in-out infinite;
         }
 
         @keyframes hintPulse {
@@ -981,60 +1364,85 @@ export default function BoardMembers() {
           50% { opacity: 1; transform: translateY(-3px); }
         }
 
-        .card-effects {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          overflow: hidden;
+        @keyframes arrowBounce {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(5px); }
         }
 
-        .particle-trail {
+        .pc-user-info {
           position: absolute;
-          width: 100%;
-          height: 100%;
-          background: 
-            radial-gradient(circle at 20% 20%, rgba(255,107,53,0.1) 0%, transparent 30%),
-            radial-gradient(circle at 80% 80%, rgba(247,147,30,0.1) 0%, transparent 30%);
+          bottom: 20px;
+          left: 20px;
+          right: 20px;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(30px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 15px;
+          padding: 12px 14px;
+          pointer-events: auto;
           opacity: 0;
-          transition: opacity 0.3s ease;
+          transform: translateY(20px);
+          transition: all 0.3s ease;
         }
 
-        .member-card:hover .particle-trail {
+        .pc-card:hover .pc-user-info,
+        .pc-card.active .pc-user-info {
           opacity: 1;
-          animation: particleSwirl 4s ease-in-out infinite;
+          transform: translateY(0);
         }
 
-        @keyframes particleSwirl {
-          0% { transform: rotate(0deg) scale(1); }
-          50% { transform: rotate(180deg) scale(1.1); }
-          100% { transform: rotate(360deg) scale(1); }
+        .pc-user-details {
+          display: flex;
+          align-items: center;
+          gap: 12px;
         }
 
-        .energy-pulse {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 10px;
-          height: 10px;
-          background: radial-gradient(circle, #ff6b35, transparent);
+        .pc-mini-avatar {
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
-          transform: translate(-50%, -50%);
-          opacity: 0;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          flex-shrink: 0;
         }
 
-        .member-card:hover .energy-pulse {
-          animation: energyPulse 1.5s ease-out infinite;
+        .pc-handle {
+          font-size: 14px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.9);
+          line-height: 1;
         }
 
-        @keyframes energyPulse {
-          0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-          100% { transform: translate(-50%, -50%) scale(20); opacity: 0; }
+        .pc-status {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+          line-height: 1;
         }
 
-        
+        .pc-contact-btn {
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 14px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          backdrop-filter: blur(10px);
+          background: rgba(255, 107, 53, 0.2);
+        }
+
+        .pc-contact-btn:hover {
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+          background: rgba(255, 107, 53, 0.4);
+          box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+        }
+
         .detail-card-overlay {
           position: fixed;
           right: 0;
@@ -1076,6 +1484,7 @@ export default function BoardMembers() {
           display: flex;
           align-items: center;
           justify-content: center;
+          overflow: hidden;
         }
 
         .quantum-btn:hover {
@@ -1083,6 +1492,23 @@ export default function BoardMembers() {
           border-color: rgba(255,107,53,0.8);
           transform: scale(1.1) rotate(90deg);
           box-shadow: 0 0 20px rgba(255,107,53,0.5);
+        }
+
+        .close-ripple {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          background: rgba(255,107,53,0.3);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          transition: all 0.5s ease;
+        }
+
+        .quantum-btn:hover .close-ripple {
+          width: 150%;
+          height: 150%;
         }
 
         .detail-content {
@@ -1122,31 +1548,6 @@ export default function BoardMembers() {
         @keyframes detailImageGlow {
           0%, 100% { opacity: 0.6; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.1); }
-        }
-
-        .detail-title-section h3 {
-          font-size: 2rem;
-          margin-bottom: 0.5rem;
-          background: linear-gradient(135deg, #ff6b35, #f7931e);
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        .detail-title-section p {
-          font-size: 1.2rem;
-          color: #e0e0e0;
-        }
-
-        .description-section {
-          margin-bottom: 2.5rem;
-        }
-
-        .member-description {
-          font-size: 1.1rem;
-          line-height: 1.8;
-          color: #cccccc;
-          text-align: justify;
         }
 
         .achievements-section {
@@ -1223,18 +1624,15 @@ export default function BoardMembers() {
           position: absolute;
           width: 100%;
           height: 100%;
-          background: 
+          background:
             radial-gradient(circle at 10% 10%, rgba(255,107,53,0.1) 0%, transparent 20%),
-            radial-gradient(circle at 90% 90%, rgba(247,147,30,0.1) 0%, transparent 20%),
-            radial-gradient(circle at 50% 50%, rgba(255,107,53,0.05) 0%, transparent 30%);
+            radial-gradient(circle at 90% 90%, rgba(247,147,30,0.1) 0%, transparent 20%);
           animation: cosmicDrift 10s ease-in-out infinite;
         }
 
         @keyframes cosmicDrift {
           0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          25% { transform: translate(10px, -10px) rotate(90deg); }
-          50% { transform: translate(0, 0) rotate(180deg); }
-          75% { transform: translate(-10px, 10px) rotate(270deg); }
+          50% { transform: translate(10px, -10px) rotate(180deg); }
         }
 
         .energy-streams {
@@ -1243,11 +1641,9 @@ export default function BoardMembers() {
           left: 0;
           width: 100%;
           height: 100%;
-          background: linear-gradient(45deg, 
-            transparent, 
-            rgba(255,107,53,0.1), 
-            transparent, 
-            rgba(247,147,30,0.1), 
+          background: linear-gradient(45deg,
+            transparent,
+            rgba(255,107,53,0.1),
             transparent);
           animation: energyFlow 6s linear infinite;
         }
@@ -1257,29 +1653,16 @@ export default function BoardMembers() {
           100% { transform: translateX(100%); }
         }
 
-        @media (max-width: 1200px) {
+        @media (max-width: 1024px) {
           .board-member {
             position: relative !important;
             width: 100% !important;
-            left: auto !important;
-            right: auto !important;
             top: auto !important;
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
           }
-
-          .central-timeline {
-            display: none;
-          }
-
-          .quantum-connector {
-            display: none;
-          }
-
-          .member-card {
-            flex-direction: row !important;
-            text-align: left !important;
-          }
-
+          .central-timeline { display: none; }
+          .member-connector { display: none; }
+          .member-card { flex-direction: row !important; text-align: left !important; }
           .detail-card-overlay {
             position: fixed;
             top: 50%;
@@ -1294,26 +1677,17 @@ export default function BoardMembers() {
           .member-card {
             flex-direction: column !important;
             text-align: center !important;
-            gap: 2rem;
+            gap: 1rem;
             padding: 2rem;
           }
-
-          .board-member.right .member-card {
-            flex-direction: column !important;
-            text-align: center !important;
-          }
-
           .detail-header {
             flex-direction: column;
             text-align: center;
           }
-
-          .detail-card {
-            padding: 2rem;
-            margin: 1rem;
-          }
+          .detail-card { padding: 2rem; margin: 1rem; }
         }
-      `}</style>
-    </section>
-  )
-}
+        `}</style>
+      </section>
+    )
+
+  }
